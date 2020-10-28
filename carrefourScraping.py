@@ -38,6 +38,12 @@ NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.1\
                                     'PrecioPrevio':precioAnt,
                                     'Ofertas':precioOferta,
                                     'Promociones':promocion})
+        
+        #Extraemos información de las páginas siguientes
+        next_page_url = response.css('a.next::attr(href)').extract_first()
+        if next_page_url:
+            next_page_url = response.urljoin(next_page_url)
+            yield scrapy.Request(url=next_page_url, callback=self.parse_productos)
 
         # Se crea un dataframe con todos los valores y se guarda como CSV
         productos = pd.DataFrame(lista_productos)
