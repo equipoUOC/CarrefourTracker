@@ -4,15 +4,12 @@ from scrapy.crawler import CrawlerProcess
 import schedule
 import time
 
-
 class CarrefourSpider(scrapy.Spider):
     name = "carrefourSpider"
 
     def start_requests(self):
         urls=['https://www.carrefour.es/supermercado/']
         for url in urls:
-            # Se configura la petición con un userAgent para evitar ser
-            # bloqueado
             yield scrapy.Request(url=url, callback=self.parse_seccion,
                                  headers=headers)
 
@@ -68,7 +65,7 @@ class CarrefourSpider(scrapy.Spider):
                                     'Ofertas':precioOferta,
                                     'Promociones':promocion})
 
-        #Extraemos información de las páginas siguientes de esta categoría
+        #Extraemos información de las páginas siguientes de esta categoria
         next_page_url = response.css('a.next::attr(href)').extract_first()
         if next_page_url:
             next_page_url = response.urljoin(next_page_url)
@@ -81,7 +78,8 @@ if __name__ == '__main__':
     # Se crea una lista donde se guardarán todos los productos encontrados
     lista_productos=[]
 
-    # Se configura la cabecera que se usará para hacer las peticiones
+    # Se configura la cabecera que se usará para hacer las peticiones y evitar
+    # ser bloqueados
     headers={"User-Agent": "Mozilla/5.0 (Windows\
 NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.1\
 11 Safari/537.36"}
@@ -90,18 +88,19 @@ NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.1\
     process.crawl(CarrefourSpider)
     process.start()
 
-    filePath = './CSVdata/ProductosCarrefour.csv'
     # Si hay productos en la lista se crea un fichero con los datos
     if lista_productos:
         # Se crea un dataframe con todos los valores y se guarda como CSV
         productos = pd.DataFrame(lista_productos)
-        productos.to_csv(filePath, columns=['Productos', 'Precio/Kg',
-                                            'Precios', 'PrecioPrevio',
-                                            'Ofertas', 'Promociones'],
+        productos.to_csv('./CSVdata/ProductosCarrefour.csv',
+                         columns=['Productos', 'Precio/Kg',
+                                  'Precios', 'PrecioPrevio',
+                                  'Ofertas', 'Promociones'],
                          encoding='utf-8-sig')
 
 
-# Programamos la araña para que recorra la web una vez todos los días a las 8hrs, así evitaríamos los bloqueos de seguridad de la web
+# Programamos la araña para que recorra la web una vez todos los días a las
+# 8hrs, así evitaríamos los bloqueos de seguridad de la web
 schedule.every().day.at("8:00").do(CarrefourSpider())
 
 while True:
