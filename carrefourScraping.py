@@ -3,6 +3,8 @@ import scrapy
 from scrapy.crawler import CrawlerProcess
 import schedule
 import time
+import datetime
+import sys
 
 class CarrefourSpider(scrapy.Spider):
     name = "carrefourSpider"
@@ -75,6 +77,7 @@ class CarrefourSpider(scrapy.Spider):
                                   headers=headers)
 
 if __name__ == '__main__':
+    
     # Se crea una lista donde se guardarán todos los productos encontrados
     lista_productos=[]
 
@@ -88,20 +91,21 @@ NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.1\
     process.crawl(CarrefourSpider)
     process.start()
 
+    fecha = '{0:%Y%m%d_%H%M}'.format(datetime.datetime.now())
+    fileName = 'ProductosCarrefour_' + fecha + '.csv'
+    filePath = './CSVdata/' + fileName
     # Si hay productos en la lista se crea un fichero con los datos
     if lista_productos:
         # Se crea un dataframe con todos los valores y se guarda como CSV
         productos = pd.DataFrame(lista_productos)
-        productos.to_csv('./CSVdata/ProductosCarrefour.csv',
-                         columns=['Productos', 'Precio/Kg',
-                                  'Precios', 'PrecioPrevio',
-                                  'Ofertas', 'Promociones'],
+        productos.to_csv(filePath, columns=['Productos', 'Precio/Kg',
+                                            'Precios', 'PrecioPrevio',
+                                            'Ofertas', 'Promociones'],
                          encoding='utf-8-sig')
 
-
 # Programamos la araña para que recorra la web una vez todos los días a las
-# 8hrs, así evitaríamos los bloqueos de seguridad de la web
-schedule.every().day.at("8:00").do(CarrefourSpider())
+# 8hrs
+schedule.every().day.at("08:00").do(CarrefourSpider())
 
 while True:
     schedule.run_pending()
