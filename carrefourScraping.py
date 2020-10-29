@@ -1,6 +1,9 @@
 import pandas as pd
 import scrapy
 from scrapy.crawler import CrawlerProcess
+import schedule
+import time
+
 
 class CarrefourSpider(scrapy.Spider):
     name = "carrefourSpider"
@@ -65,7 +68,7 @@ class CarrefourSpider(scrapy.Spider):
                                     'Ofertas':precioOferta,
                                     'Promociones':promocion})
 
-        #Extraemos información de las páginas siguientes de esta categoria
+        #Extraemos información de las páginas siguientes de esta categoría
         next_page_url = response.css('a.next::attr(href)').extract_first()
         if next_page_url:
             next_page_url = response.urljoin(next_page_url)
@@ -96,3 +99,11 @@ NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.1\
                                             'Precios', 'PrecioPrevio',
                                             'Ofertas', 'Promociones'],
                          encoding='utf-8-sig')
+
+
+# Programamos la araña para que recorra la web una vez todos los días a las 8hrs, así evitaríamos los bloqueos de seguridad de la web
+schedule.every().day.at("8:00").do(CarrefourSpider())
+
+while True:
+    schedule.run_pending()
+    time.sleep(1)
