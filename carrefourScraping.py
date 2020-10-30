@@ -2,6 +2,7 @@ import datetime
 import pandas as pd
 import scrapy
 from scrapy.crawler import CrawlerProcess
+import sys
 
 class CarrefourSpider(scrapy.Spider):
     name = "carrefourSpider"
@@ -24,6 +25,9 @@ class CarrefourSpider(scrapy.Spider):
         #Extraemos links de diferentes secciones
         listaSecciones = response.css('div#inner-level-list a::attr(href)')\
             .extract()
+        # print("ListaSecciones: {}".format(listaSecciones))
+        secciones = response.css('div#inner-level-list a ::text').extract()
+        # print("Secciones: {}".format(secciones))
         for link in listaSecciones:
             next_page_url = response.urljoin(link)
             # print("Seccion siguiente: {}".format(next_page_url))
@@ -35,6 +39,8 @@ class CarrefourSpider(scrapy.Spider):
         #Extraemos links de las diferentes categorias
         listaCategorias = response.css('div.category-box a::attr(href)')\
             .extract()
+        categorias = response.css('div.category-box a ::text').extract()
+        # print("Categorias: {}".format(categorias))
         for link in listaCategorias:
             next_page_url = response.urljoin(link)
             # print("Categoria siguiente: {}".format(next_page_url))
@@ -46,7 +52,7 @@ class CarrefourSpider(scrapy.Spider):
         # Se filtran los "product-card-item" para no mezclar precios
         items_producto = response.css('article.product-card-item')
         # print("Se han encontrado {} productos".format(len(items_producto)-1))
-        # Se recorre cada item para extraer el nonmbre, los precios y las
+        # Se recorre cada item para extraer el nombre, los precios y las
         # ofertas
         for item in items_producto:
             #Buscamos los nombres del producto
@@ -57,9 +63,10 @@ class CarrefourSpider(scrapy.Spider):
             precioKg = item.css('p.format-price ::text').extract_first()
             promocion = item.css('p.promocion-copy ::text').extract_first()
             # Se añade a la lista un diccionario con los valores capturados
-            lista_productos.append({'Productos':producto,
+            # TODO Añadir Seccion, Categoria y enlace al producto
+            lista_productos.append({'Descripcion':producto,
                                     'Precio/Kg':precioKg,
-                                    'Precios':precio,
+                                    'Precio':precio,
                                     'PrecioPrevio':precioAnt,
                                     'Ofertas':precioOferta,
                                     'Promociones':promocion})
@@ -88,14 +95,15 @@ NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.1\
     process.crawl(CarrefourSpider)
     process.start()
 
-    fecha = '{0:%Y%m%d_%H%M}'.format(datetime.datetime.now())
-    fileName = 'ProductosCarrefour_' + fecha + '.csv'
+    fecha = '{0:%d%m%Y_%H%M}'.format(datetime.datetime.now())
+    fileName = 'CarrefourDailyPricing_' + fecha + '.csv'
     filePath = './CSVdata/' + fileName
     # Si hay productos en la lista se crea un fichero con los datos
     if lista_productos:
         # Se crea un dataframe con todos los valores y se guarda como CSV
         productos = pd.DataFrame(lista_productos)
-        productos.to_csv(filePath, columns=['Productos', 'Precio/Kg',
-                                            'Precios', 'PrecioPrevio',
-                                            'Ofertas', 'Promociones'],
+        productos.to_csv(filePath, columns=['Descripcion',
+                                            'Precio/Kg', 'Precio',
+                                            'PrecioPrevio', 'Ofertas',
+                                            'Promociones'],
                          encoding='utf-8-sig')
