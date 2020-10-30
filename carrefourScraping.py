@@ -1,10 +1,7 @@
+import datetime
 import pandas as pd
 import scrapy
 from scrapy.crawler import CrawlerProcess
-import schedule
-import time
-import datetime
-import sys
 
 class CarrefourSpider(scrapy.Spider):
     name = "carrefourSpider"
@@ -102,11 +99,3 @@ NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.1\
                                             'Precios', 'PrecioPrevio',
                                             'Ofertas', 'Promociones'],
                          encoding='utf-8-sig')
-
-# Programamos la araña para que recorra la web una vez todos los días a las
-# 8hrs
-schedule.every().day.at("08:00").do(CarrefourSpider())
-
-while True:
-    schedule.run_pending()
-    time.sleep(1)
