@@ -92,8 +92,8 @@ class CarrefourSpider(scrapy.Spider):
                     .extract_first()
                 item['precioOferta'] = producto.css('span.price-less ::text')\
                     .extract_first()
-                item['precio_Kg'] = producto.css('p.format-price ::text')\
-                    .extract_first()
+                item['precio_Kg'] = producto.css('p.format-price::text')\
+                    .re('.*\|\s(.*)')[0]
                 item['promocion'] = producto.css('p.promocion-copy ::text')\
                     .extract_first()
                 link = producto.css('a.js-gap-product-click-super ::attr(href)')\
