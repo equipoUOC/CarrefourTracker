@@ -20,16 +20,23 @@ class CarrefourSpider(scrapy.Spider):
     def start_requests(self):
         urls=['https://www.carrefour.es/supermercado/']
         for url in urls:
-            yield scrapy.Request(url=url, callback=self.parse_seccion,
-                                 headers=headers)
+            try:
+                yield scrapy.Request(url=url, callback=self.parse_seccion,
+                                     headers=headers)
+            except Exception as e:
+                raise ValueError("ERROR haciendo petición a la url {}\n{}"
+                                 .format(url, e))
 
     def descargar_links(self, response):
-        # Se captura el título de la web actual y se utiliza como nombre del
-        # fichero html que se guarda
-        titulo = response.css('title::text').extract_first()
-        html_file = './web/' + str(titulo) + '.html'
-        with open( html_file, 'wb' ) as fout:
-            fout.write( response.body )
+        try:
+            # Se captura el título de la web actual y se utiliza como nombre
+            # del fichero html que se guarda
+            titulo = response.css('title::text').extract_first()
+            html_file = './web/' + str(titulo) + '.html'
+            with open( html_file, 'wb' ) as fout:
+                fout.write( response.body )
+        except Exception as e:
+            raise ValueError("ERROR guardando el html:\n{}".format(e))
 
     def parse_seccion(self, response):
         # Se extraen y se siguen todos los enlaces encontrados correspondientes
@@ -53,50 +60,55 @@ class CarrefourSpider(scrapy.Spider):
         # Se recorre cada item para extraer el nombre, los precios y las
         # ofertas
         for producto in items_producto:
-            # Busca el nombre del producto
-            descripcion = producto.css('p.title-product ::text')\
-                .extract_first()
-            # Si hay descripción asignamos los valores, sino se comprueba si
-            # hay página siguiente
-            if(descripcion):
-                item = CarrefourItem()
-                item['seccion'] = response.css('li.subCategoryName').xpath(
-                    './preceding-sibling::li[1]/a/text()').extract_first()
-                item['categoria'] = response.css('li.subCategoryName::text')\
+            try:
+                # Busca el nombre del producto
+                descripcion = producto.css('p.title-product ::text')\
                     .extract_first()
-                item['descripcion'] = descripcion
-                item['precio'] = producto.css('span.price ::text')\
-                    .extract_first()
-                item['precioPrevio'] = producto.css('strike ::text')\
-                    .extract_first()
-                item['precioOferta'] = producto.css('span.price-less ::text')\
-                    .extract_first()
-                item['precio_Kg'] = producto.css('p.format-price::text')\
-                    .re('.*\|\s(.*)')[0]
-                item['promocion'] = producto.css('p.promocion-copy ::text')\
-                    .extract_first()
-                link = producto.css('a.js-gap-product-click-super ::attr(href)')\
-                    .extract_first()
-                item['enlace'] = response.urljoin(link)
-                # Se añade a la lista un diccionario con los valores capturados
-                lista_productos.append({'Seccion':item['seccion'],
-                                        'Categoria':item['categoria'],
-                                        'Descripcion':item['descripcion'],
-                                        'Precio/Kg':item['precio_Kg'],
-                                        'Precio':item['precio'],
-                                        'PrecioPrevio':item['precioPrevio'],
-                                        'Ofertas':item['precioOferta'],
-                                        'Promociones':item['promocion'],
-                                        'Enlace':item['enlace']})
-            else:
-                # Extraemos información de las páginas siguientes de la
-                # misma categoria
-                next_page_url = response.css('a.next::attr(href)')\
-                    .extract_first()
-                if next_page_url:
-                    yield response.follow(url=next_page_url,
-                                          callback=self.parse_productos,
-                                          headers=headers)
+                # Si hay descripción asignamos los valores, sino se comprueba si
+                # hay página siguiente
+                if(descripcion):
+                    item = CarrefourItem()
+                    item['seccion'] = response.css('li.subCategoryName').xpath(
+                        './preceding-sibling::li[1]/a/text()').extract_first()
+                    item['categoria'] = response.css('li.subCategoryName::text')\
+                        .extract_first()
+                    item['descripcion'] = descripcion
+                    item['precio'] = producto.css('span.price ::text')\
+                        .extract_first()
+                    item['precioPrevio'] = producto.css('strike ::text')\
+                        .extract_first()
+                    item['precioOferta'] = producto.css('span.price-less ::text')\
+                        .extract_first()
+                    item['precio_Kg'] = producto.css('p.format-price::text')\
+                        .re('.*\|\s(.*)')[0]
+                    item['promocion'] = producto.css('p.promocion-copy ::text')\
+                        .extract_first()
+                    link = producto.css('a.js-gap-product-click-super ::attr(href)')\
+                        .extract_first()
+                    item['enlace'] = response.urljoin(link)
+                    # Se añade a la lista un diccionario con los valores
+                    # capturados
+                    lista_productos.append({'Seccion':item['seccion'],
+                                            'Categoria':item['categoria'],
+                                            'Descripcion':item['descripcion'],
+                                            'Precio/Kg':item['precio_Kg'],
+                                            'Precio':item['precio'],
+                                            'PrecioPrevio':item['precioPrevio'],
+                                            'Ofertas':item['precioOferta'],
+                                            'Promociones':item['promocion'],
+                                            'Enlace':item['enlace']})
+                else:
+                    # Extraemos información de las páginas siguientes de la
+                    # misma categoria
+                    next_page_url = response.css('a.next::attr(href)')\
+                        .extract_first()
+                    if next_page_url:
+                        yield response.follow(url=next_page_url,
+                                              callback=self.parse_productos,
+                                              headers=headers)
+            except Exception as e:
+                raise ValueError("ERROR parseando el producto {}.\n{}"
+                                 .format(descripcion, e))
 
 if __name__ == '__main__':
     
@@ -116,13 +128,17 @@ NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.1\
     fecha = '{0:%d%m%Y_%H%M}'.format(datetime.datetime.now())
     fileName = 'CarrefourDailyPricing_' + fecha + '.csv'
     filePath = './CSVdata/' + fileName
-    # Si hay productos en la lista se crea un fichero con los datos
-    if lista_productos:
-        # Se crea un dataframe con todos los valores y se guarda como CSV
-        productos = pd.DataFrame(lista_productos)
-        productos.to_csv(filePath, columns=['Seccion', 'Categoria',
-                                            'Descripcion', 'Precio/Kg',
-                                            'Precio', 'PrecioPrevio',
-                                            'Ofertas', 'Promociones',
-                                            'Enlace'],
-                         encoding='utf-8-sig')
+
+    try:
+        # Si hay productos en la lista se crea un fichero con los datos
+        if lista_productos:
+            # Se crea un dataframe con todos los valores y se guarda como CSV
+            productos = pd.DataFrame(lista_productos)
+            productos.to_csv(filePath, columns=['Seccion', 'Categoria',
+                                                'Descripcion', 'Precio/Kg',
+                                                'Precio', 'PrecioPrevio',
+                                                'Ofertas', 'Promociones',
+                                                'Enlace'],
+                             encoding='utf-8-sig')
+    except Exception as e:
+        raise ValueError("ERROR guardando el csv:\n{}".format(e))
