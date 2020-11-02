@@ -79,7 +79,7 @@ class CarrefourSpider(scrapy.Spider):
                         .extract_first()
                     item['precioOferta'] = producto.css('span.price-less ::text')\
                         .extract_first()
-                    item['precio_Kg'] = producto.css('p.format-price::text')\
+                    item['precio_Kg_ud_L'] = producto.css('p.format-price::text')\
                         .re('.*\|\s(.*)')[0]
                     item['promocion'] = producto.css('p.promocion-copy ::text')\
                         .extract_first()
@@ -91,7 +91,7 @@ class CarrefourSpider(scrapy.Spider):
                     lista_productos.append({'Seccion':item['seccion'],
                                             'Categoria':item['categoria'],
                                             'Descripcion':item['descripcion'],
-                                            'Precio/Kg':item['precio_Kg'],
+                                            'Precio(Kg/ud/L)':item['precio_Kg_ud_L'],
                                             'Precio':item['precio'],
                                             'PrecioPrevio':item['precioPrevio'],
                                             'Ofertas':item['precioOferta'],
@@ -135,7 +135,7 @@ NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.1\
             # Se crea un dataframe con todos los valores y se guarda como CSV
             productos = pd.DataFrame(lista_productos)
             productos.to_csv(filePath, columns=['Seccion', 'Categoria',
-                                                'Descripcion', 'Precio/Kg',
+                                                'Descripcion', 'Precio(Kg/ud/L)',
                                                 'Precio', 'PrecioPrevio',
                                                 'Ofertas', 'Promociones',
                                                 'Enlace'],
