@@ -13,6 +13,7 @@ class CarrefourItem(scrapy.Item):
     precioOferta = scrapy.Field()
     promocion = scrapy.Field()
     enlace = scrapy.Field()
+    
 
 class CarrefourSpider(scrapy.Spider):
     name = "carrefourSpider"
@@ -80,7 +81,7 @@ class CarrefourSpider(scrapy.Spider):
                     item['precioOferta'] = producto.css('span.price-less ::text')\
                         .extract_first()
                     item['precio_Kg_ud_L'] = producto.css('p.format-price::text')\
-                        .re('.*\|\s(.*)')[0]
+                    .re('.*\|\s(.*)')[0]
                     item['promocion'] = producto.css('p.promocion-copy ::text')\
                         .extract_first()
                     link = producto.css('a.js-gap-product-click-super ::attr(href)')\
@@ -97,6 +98,12 @@ class CarrefourSpider(scrapy.Spider):
                                             'Ofertas':item['precioOferta'],
                                             'Promociones':item['promocion'],
                                             'Enlace':item['enlace']})
+                
+                #En caso de que los tags donde se encuentra la categoría sean diferentes
+                elif (item['categoria'] != response.css('li.subCategoryName')):
+                    item['categoria'] = response.css('li.breadcrumb__item::text')\
+                        .extract_first()
+
                 else:
                     # Extraemos información de las páginas siguientes de la
                     # misma categoria
