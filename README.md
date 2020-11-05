@@ -7,4 +7,5 @@ Para utilizar este script es recomendable utilizar las siguientes  instrucciones
 
 	1. Crear un nuevo entorno conda para instalar los paquetes de forma independiente al sistema: "conda create -n {nombreEntorno}"
 	2. Activar el entorno: "conda activate {nombreEntorno}"
-	3. Ejecutar el programa: "scrapy crawl carrefourSpider -o ../CSVdata/CarrefourDailyPricing_05112020_2340.csv"
+	3. Ir al directorio src
+	4. Ejecutar el programa: "scrapy crawl carrefourSpider -o ../CSVdata/CarrefourDailyPricing_05112020_2340.csv"
