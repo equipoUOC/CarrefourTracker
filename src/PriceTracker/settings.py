@@ -20,8 +20,8 @@ USER_AGENT = 'PriceTracker (estudiante)'
 ROBOTSTXT_OBEY = True
 
 # Orden de las columnas del CSV
-FEED_EXPORT_FIELDS = ['seccion', 'categoria', 'descripcion', 'precio_Kg_L_ud',
-                      'precio', 'precioPrevio', 'precioOferta', 'promocion', 'enlace']
+# FEED_EXPORT_FIELDS = ['seccion', 'categoria', 'descripcion', 'precio_Kg_L_ud',
+#                      'precio', 'precioPrevio', 'precioOferta', 'promocion', 'enlace']
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
 #CONCURRENT_REQUESTS = 32

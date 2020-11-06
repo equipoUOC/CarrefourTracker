@@ -6,6 +6,23 @@ from ..items import PricetrackerItem
 
 class CarrefourSpider(scrapy.Spider):
     name = "carrefourSpider"
+    fecha = '{0:%d%m%Y_%H%M}'.format(datetime.datetime.now())
+    fileName = 'CarrefourDailyPricing_' + fecha + '.csv'
+    filePath = './CSVdata/' + fileName
+    custom_settings = {'FEED_URI': filePath, 'FEED_FORMAT': 'csv'}
+    
+    # custom_settings = {pathlib.Path(filePath): {'format': 'csv',
+    #                                             'encoding': 'utf8-sig',
+    #                                             'store_empty': True,
+    #                                             'fields': ['seccion',
+    #                                                        'categoria',
+    #                                                        'descripcion',
+    #                                                        'precio_Kg_L_ud',
+    #                                                        'precio',
+    #                                                        'precioPrevio',
+    #                                                        'precioOferta',
+    #                                                        'promocion',
+    #                                                        'enlace'],},}
 
     def start_requests(self):
         urls=['https://www.carrefour.es/supermercado/']
