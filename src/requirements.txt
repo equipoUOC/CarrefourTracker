@@ -1,25 +1,13 @@
-attrs @ file:///home/conda/feedstock_root/build_artifacts/attrs_1599308529326/work
 Automat==20.2.0
-bcrypt @ file:///D:/bld/bcrypt_1602547008978/work
 certifi==2020.6.20
-cffi @ file:///D:/bld/cffi_1602537433319/work
 constantly==15.1.0
-cryptography @ file:///D:/bld/cryptography_1604179264939/work
 cssselect==1.1.0
-hyperlink @ file:///home/conda/feedstock_root/build_artifacts/hyperlink_1596631460104/work
-idna @ file:///home/conda/feedstock_root/build_artifacts/idna_1593328102638/work
 incremental==17.5.0
-itemadapter @ file:///home/conda/feedstock_root/build_artifacts/itemadapter_1601475707805/work
-itemloaders @ file:///home/conda/feedstock_root/build_artifacts/itemloaders_1599661894329/work
-jmespath @ file:///home/conda/feedstock_root/build_artifacts/jmespath_1589369830981/work
-lxml @ file:///D:/bld/lxml_1603105115271/work
 numpy==1.19.2
 pandas==1.1.4
-parsel @ file:///home/conda/feedstock_root/build_artifacts/parsel_1591122878042/work
 Protego==0.1.16
 pyasn1==0.4.8
 pyasn1-modules==0.2.7
-pycparser @ file:///home/conda/feedstock_root/build_artifacts/pycparser_1593275161868/work
 PyDispatcher==2.0.5
 PyHamcrest==2.0.2
 pyOpenSSL==19.1.0
@@ -27,10 +15,5 @@ python-dateutil==2.8.1
 pytz==2020.4
 pywin32==228
 queuelib==1.5.0
-Scrapy @ file:///D:/bld/scrapy_1604052234371/work
 service-identity==18.1.0
-six @ file:///home/conda/feedstock_root/build_artifacts/six_1590081179328/work
-Twisted @ file:///D:/bld/twisted_1602649281755/work
-w3lib @ file:///home/conda/feedstock_root/build_artifacts/w3lib_1591173357158/work
 wincertstore==0.2
-zope.interface @ file:///D:/bld/zope.interface_1602253514611/work
