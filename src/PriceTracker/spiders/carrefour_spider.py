@@ -42,16 +42,36 @@ class CarrefourSpider(scrapy.Spider):
             raise ValueError("ERROR guardando el html:\n{}".format(e))
 
     def parse_seccion(self, response):
-        # Se extraen y se siguen todos los enlaces encontrados correspondientes
-        # a las diferentes secciones
-        yield from response.follow_all(css='li.level2-item a',
-                                       callback=self.parse_categoria)
+        # Extraemos el código html correspodiente a cada sección
+        listaSecciones = response.css('li.level2-item a')
+        # print("Se han encontrado {} secciones.".format(len(listaSecciones)))
+        # Para cada sección, seguimos el enlace hacia las diferentes categorías
+        for seccion in listaSecciones[0:2]:
+            # Se captura el nombre de la sección
+            nombreSeccion = seccion.css('a ::text').extract_first()
+            print("Seccion: {}".format(nombreSeccion))
+            # Se extra el link de esta sección
+            link = seccion.css('a::attr(href)').extract_first()
+            # print("linkSeccion: {}".format(link))
+            yield response.follow(url=link,
+                                  callback=self.parse_categoria)
 
     def parse_categoria(self, response):
-        # Se extraen y se siguen todos los enlaces encontrados correspondientes
-        # a las diferentes categorias
-        yield from response.follow_all(css='div.category a',
-                                       callback=self.parse_productos)
+        # Extraemos el código html de las diferentes categorias
+        listaCategorias = response.css('div.category')
+        # print("Se han encontrado {} categorias.".format(len(listaCategorias)))
+        for categoria in listaCategorias[0:5]:
+            nombreCategoria = categoria.css('p.nombre-categoria::text')\
+                .extract_first()
+            print("Categoría: {}".format(nombreCategoria))
+            # Si se trata de una de las siguientes categorías se salta
+            if(("Bio" or "Ofertas" or "Congelados") in nombreCategoria):
+                continue
+            # Se extrae el link de esta categoria
+            link = categoria.css('a::attr(href)').extract_first()
+            # print("linkCategoria: {}".format(link))
+            yield response.follow(url=link,
+                                  callback=self.parse_productos)
 
     def parse_productos(self, response):
         # Se filtran los "product-card-item" para no mezclar precios
@@ -59,7 +79,7 @@ class CarrefourSpider(scrapy.Spider):
         # print("Se han encontrado {} productos".format(len(items_producto)-1))
         # Se recorre cada item para extraer el nombre, los precios y las
         # ofertas
-        for producto in items_producto:
+        for producto in items_producto[0:2]:
             try:
                 descripcion = producto.css('p.title-product ::text')\
                     .extract_first()
