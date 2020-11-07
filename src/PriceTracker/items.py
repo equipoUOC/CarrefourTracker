@@ -10,7 +10,7 @@ class PricetrackerItem(scrapy.Item):
     seccion = scrapy.Field()
     categoria = scrapy.Field()
     descripcion = scrapy.Field()
-    precio_Kg_L_ud = scrapy.Field()
+    precioMedida = scrapy.Field()
     precio = scrapy.Field()
     precioPrevio = scrapy.Field()
     precioOferta = scrapy.Field()
