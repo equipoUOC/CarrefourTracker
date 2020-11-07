@@ -37,7 +37,7 @@ def crawl():
     # crawl_job() devuelve un Deferred
     d = crawl_job()
     # Programa el raspado para cada día a la hora indicada
-    d.addCallback(schedule_next_crawl, hour=08, minute=00)
+    d.addCallback(schedule_next_crawl, hour=8, minute=00)
     # Programa una espera de los segundos indicados hasta el siguiente raspado
     # d.addCallback(temporizador, 30)
     d.addErrback(catch_error)
