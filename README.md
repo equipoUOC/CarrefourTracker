@@ -5,7 +5,7 @@ En el presente proyecto, hemos construido un web crawler capaz de navegar por la
 Para utilizar este script es necesario seguir los siguientes pasos:
 
 	1. Instalar Anaconda en nuestro equipo
-	2. Crear un nuevo entorno conda para instalar los paquetes de forma independiente al sistema:
+	2. Dentro de Anaconda Prompt, crear un nuevo entorno conda para instalar los paquetes de forma independiente al sistema:
 			"conda create -n {nombreEntorno}"
 	3. Activar el entorno: "conda activate {nombreEntorno}"
 	4. Instalar scrapy: "conda install -c conda-forge scrapy"
